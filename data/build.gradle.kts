@@ -48,8 +48,10 @@ dependencies {
     api(libs.kotlinx.coroutines.android)
 
     implementation(libs.retrofit)
-    implementation("com.google.dagger:hilt-android:2.51.1")
-    kapt("com.google.dagger:hilt-android-compiler:2.51.1")
+    implementation(libs.logging.interceptor)
+    implementation(libs.timber)
+    implementation(libs.hilt.android)
+    kapt(libs.hilt.android.compiler)
 
     testImplementation(libs.junit)
     testImplementation(libs.mockk.android)

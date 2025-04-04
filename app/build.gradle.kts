@@ -23,8 +23,16 @@ android {
         versionCode = 1
         versionName = "1.0"
 
-        buildConfigField("String", "API_BASE_URL", "\"${(getLocalProperty("api.baseUrl") as String)}\"")
-        buildConfigField("String", "API_AUTH_TOKEN", "\"${(getLocalProperty("api.authToken") as String)}\"")
+        buildConfigField(
+            "String",
+            "API_BASE_URL",
+            "\"${(getLocalProperty("api.baseUrl") as String)}\""
+        )
+        buildConfigField(
+            "String",
+            "API_AUTH_TOKEN",
+            "\"${(getLocalProperty("api.authToken") as String)}\""
+        )
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -68,9 +76,9 @@ dependencies {
     implementation(libs.androidx.navigation.fragment)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.timber)
-    implementation("com.google.dagger:hilt-android:2.51.1")
-    kapt("com.google.dagger:hilt-android-compiler:2.51.1")
-    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
+    implementation(libs.hilt.android)
+    kapt(libs.hilt.android.compiler)
+    implementation(libs.androidx.hilt.navigation.compose)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

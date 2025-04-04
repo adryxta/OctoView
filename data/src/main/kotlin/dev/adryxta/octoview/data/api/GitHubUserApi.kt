@@ -4,7 +4,7 @@ import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
-import okhttp3.MediaType
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
@@ -119,8 +119,8 @@ internal interface GitHubUserApi {
         }
 
         private val gitHubConvertorFactories = arrayOf(
-            MediaType.get("application/json; charset=UTF8"),
-            MediaType.get("application/vnd.github+json"),
+            "application/json; charset=UTF8".toMediaType(),
+            "application/vnd.github+json".toMediaType(),
         ).map { ParseJson.asConverterFactory(it) }
 
         fun create(
@@ -131,6 +131,8 @@ internal interface GitHubUserApi {
             val okHttpClient = OkHttpClient.Builder()
                 //.cache(Cache())
                 .followRedirects(true)
+                .addInterceptor(TimberLogger.Interceptor)
+                .addInterceptor(NetworkError.Interceptor)
                 .addInterceptor { chain ->
                     val request = chain.request()
                     val newRequest = request.newBuilder()

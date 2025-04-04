@@ -6,6 +6,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dev.adryxta.octoview.data.api.GitHubUserApi
 import javax.inject.Named
+import javax.inject.Singleton
 
 /**
  * Module that provides dependencies for the data layer.
@@ -18,6 +19,7 @@ import javax.inject.Named
 class DataModule {
 
     @Provides
+    @Singleton
     internal fun provideApiService(
         @Named(API_BASE_URL) baseUrl: String,
         @Named(API_AUTH_TOKEN) authToken: String
@@ -26,6 +28,7 @@ class DataModule {
     }
 
     @Provides
+    @Singleton
     internal fun provideUserRepository(
         gitHubUserApi: GitHubUserApi
     ): UserRepository {
