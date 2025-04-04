@@ -8,10 +8,12 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
 import dev.adryxta.octoview.data.UserLogin
 
 @Composable
 fun ListScreen(
+    viewModel: ListViewModel = hiltViewModel(),
     onProfileClick: (login: UserLogin) -> Unit
 ) {
     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->

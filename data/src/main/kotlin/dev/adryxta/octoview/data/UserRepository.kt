@@ -5,6 +5,7 @@ import dev.adryxta.octoview.data.mapper.toModel
 import dev.adryxta.octoview.data.model.User
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import javax.inject.Inject
 
 typealias UserLogin = String
 
@@ -15,7 +16,7 @@ interface UserRepository {
     fun getUserDetails(login: UserLogin): Flow<User>
 }
 
-internal class DefaultUserRepository(
+internal class DefaultUserRepository @Inject constructor(
     private val gitHubUserApi: GitHubUserApi
 ) : UserRepository {
 
