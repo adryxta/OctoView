@@ -1,19 +1,19 @@
 package dev.adryxta.octoview.ui.list
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Card
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import dev.adryxta.octoview.R
 import dev.adryxta.octoview.data.UserLogin
+import dev.adryxta.octoview.ui.common.TopBar
 
 @Composable
 fun ListScreen(
@@ -22,19 +22,30 @@ fun ListScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
-    Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-        Column(
-            modifier = Modifier.padding(innerPadding)
-        ) {
-            uiState.users.forEach { profile ->
-                Surface(onClick = {
-                    onProfileClick(profile.login)
-                }) {
-                    Card(modifier = Modifier.padding(16.dp)) {
-                        Text(profile.login)
-                    }
+    Scaffold(
+        topBar = {
+            TopBar(
+                title = "GitHub Users",
+                navigationIcon = {
+                    Icon(
+                        painter = painterResource(R.drawable.github_mark),
+                        modifier = Modifier
+                            .size(56.dp)
+                            .padding(12.dp),
+                        contentDescription = null,
+                    )
+                },
+            )
+        },
+        content = {
+            UserList(
+                uiState = uiState,
+                modifier = Modifier.padding(it),
+                users = uiState.users,
+                onClick = { user ->
+                    onProfileClick(user.login)
                 }
-            }
+            )
         }
-    }
+    )
 }
