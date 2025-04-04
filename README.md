@@ -9,7 +9,7 @@ api.authToken=<YourGH Token or PAT>
 
 ### TODOs
 
-- [ ] Add error handling to the Retrofit service
-- [ ] Add a caching strategy to the Retrofit service
-- [ ] Add Custom Error types
+- [x] Add error handling to the Retrofit service
+- [x] Add a caching strategy to the Retrofit service
+- [x] Add Custom Error types
 - [ ] Test for ViewModels

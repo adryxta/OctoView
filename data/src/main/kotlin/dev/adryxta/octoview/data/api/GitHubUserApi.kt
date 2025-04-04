@@ -4,6 +4,7 @@ import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
+import okhttp3.Cache
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
@@ -125,11 +126,10 @@ internal interface GitHubUserApi {
 
         fun create(
             baseUrl: String,
-            authToken: String
+            authToken: String,
+            cache: Cache? = null
         ): GitHubUserApi {
-            // https://docs.github.com/en/rest/using-the-rest-api
             val okHttpClient = OkHttpClient.Builder()
-                //.cache(Cache())
                 .followRedirects(true)
                 .addInterceptor(TimberLogger.Interceptor)
                 .addInterceptor(NetworkError.Interceptor)
@@ -141,6 +141,8 @@ internal interface GitHubUserApi {
                         .header("Authorization", "Bearer $authToken")
                         .build()
                     chain.proceed(newRequest)
+                }.apply {
+                    cache?.let { cache(it) }
                 }.build()
 
             val retrofit = Retrofit.Builder()
