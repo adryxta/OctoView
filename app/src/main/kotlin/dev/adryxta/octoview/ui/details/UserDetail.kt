@@ -180,7 +180,7 @@ fun UserDetail(
                         )
                     }
                 }
-                details?.blog?.let {
+                details?.blog?.takeIf { it.isNotEmpty() }?.let { //removes both null and empty blogs value
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier
