@@ -80,6 +80,7 @@ fun UserDetail(
                         modifier = Modifier
                             .padding(16.dp),
                         maxLines = 1,
+                        style = MaterialTheme.typography.titleMedium
                     )
                 }
             }
