@@ -14,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -46,6 +47,7 @@ fun DetailsScreen(
                         )
                     }
                 },
+                modifier = Modifier.shadow(4.dp)
             )
         },
         bottomBar = {
@@ -69,8 +71,10 @@ fun DetailsScreen(
             Box(modifier = Modifier.padding(it)) {
                 when (uiState) {
                     is DetailUiState.Error -> ErrorItem(
-                        message = (uiState as DetailUiState.Error).error?.message ?: "Unknown error",
+                        message = (uiState as DetailUiState.Error).error?.message
+                            ?: "Unknown error",
                     )
+
                     is DetailUiState.Success -> {
                         UserDetail(
                             profile = (uiState as DetailUiState.Success).profile,

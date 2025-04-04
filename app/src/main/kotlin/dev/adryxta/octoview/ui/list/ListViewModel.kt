@@ -75,9 +75,10 @@ class ListViewModel @Inject internal constructor(
             }.onSuccess { result ->
                 viewModelState.update {
                     it.copy(
-                        users = it.users.toMutableList().apply { addAll(result.getOrThrow()) },
-                        lastId = result.getOrThrow().size.plus(it.lastId?: 0)
-                    ) }
+                        users = it.users.toMutableList().apply { addAll(result) },
+                        lastId = result.size.plus(it.lastId ?: 0)
+                    )
+                }
             }.also { viewModelState.update { it.copy(isLoading = false) } }
         }
     }

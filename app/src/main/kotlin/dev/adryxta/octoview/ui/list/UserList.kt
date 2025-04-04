@@ -1,6 +1,7 @@
 package dev.adryxta.octoview.ui.list
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
@@ -14,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
 import dev.adryxta.octoview.data.model.User
 import dev.adryxta.octoview.ui.common.LoadingItem
@@ -43,10 +45,11 @@ fun UserList(
         }
     ) {
         LazyVerticalGrid(
-            modifier = modifier
-                .padding(20.dp),
-            columns = GridCells.Fixed(2),
-            horizontalArrangement = Arrangement.SpaceEvenly,
+            modifier = modifier,
+            columns = GridCells.Adaptive(minSize = 156.dp),
+            contentPadding = PaddingValues(32.dp),
+            horizontalArrangement = Arrangement.spacedBy(32.dp, Alignment.CenterHorizontally),
+            verticalArrangement = Arrangement.spacedBy(32.dp, Alignment.Top),
         ) {
             items(users) { user ->
                 UserCard(
@@ -55,14 +58,15 @@ fun UserList(
                     onClick = { onClick(user) }
                 )
             }
-            item(span = { GridItemSpan(2) }) {
+            item(span = { GridItemSpan(maxLineSpan) }) {
                 LoadingItem(onVisible = { fetchMore() })
             }
         }
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showSystemUi = true)
+@PreviewScreenSizes
 @Composable
 private fun UserListScreenPreview() {
     UserList(
