@@ -14,6 +14,7 @@ activityCompose = "1.10.1"
 composeBom = "2024.09.00"
 mockkAgent = "1.13.17"
 mockkAndroid = "1.13.17"
+navigationCompose = "2.8.9"
 retrofit = "2.11.0"
 timber = "5.0.1"
 appcompat = "1.7.0"
@@ -23,6 +24,8 @@ turbine = "1.2.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
+androidx-navigation-fragment = { module = "androidx.navigation:navigation-fragment", version.ref = "navigationCompose" }
 converter-kotlinx-serialization = { module = "com.squareup.retrofit2:converter-kotlinx-serialization", version.ref = "converterKotlinxSerialization" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }

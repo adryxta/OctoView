@@ -4,44 +4,47 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
+import dev.adryxta.octoview.ui.details.DetailsScreen
+import dev.adryxta.octoview.ui.list.ListScreen
 import dev.adryxta.octoview.ui.theme.OctoViewTheme
+import kotlinx.serialization.Serializable
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
+            val navController = rememberNavController()
             OctoViewTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                NavHost(navController = navController, startDestination = Routes.List) {
+                    composable<Routes.List> {
+                        ListScreen(onProfileClick = { login ->
+                            navController.navigate(Routes.Details(login))
+                        })
+                    }
+                    composable<Routes.Details> { backStackEntry ->
+                        val (login) = backStackEntry.toRoute<Routes.Details>()
+                        DetailsScreen(
+                            login = login,
+                            onBackClick = { navController.popBackStack() }
+                        )
+                    }
                 }
             }
         }
     }
-}
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
+    @Serializable
+    sealed class Routes {
 
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    OctoViewTheme {
-        Greeting("Android")
+        @Serializable
+        data object List : Routes()
+
+        @Serializable
+        data class Details(val login: String) : Routes()
     }
 }

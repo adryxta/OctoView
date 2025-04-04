@@ -38,10 +38,13 @@ android {
 
 dependencies {
 
+    api(libs.converter.kotlinx.serialization)
+    api(libs.kotlinx.serialization.json)
+    api(libs.kotlinx.coroutines.android)
+
     implementation(libs.retrofit)
-    implementation(libs.converter.kotlinx.serialization)
-    implementation(libs.kotlinx.serialization.json)
-    implementation(libs.kotlinx.coroutines.android)
+
+
 
     testImplementation(libs.junit)
     testImplementation(libs.mockk.android)
