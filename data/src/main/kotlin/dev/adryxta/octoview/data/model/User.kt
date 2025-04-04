@@ -1,6 +1,6 @@
 package dev.adryxta.octoview.data.model
 
-import java.util.Date
+import java.time.LocalDateTime
 
 sealed class User {
     abstract val id: Int
@@ -33,7 +33,7 @@ sealed class User {
         val publicRepos: Int,
         val publicGists: Int,
         val twitterUsername: String?,
-        val createAt: Date,
-        val updatedAt: Date
+        val createdAt: LocalDateTime,
+        val updatedAt: LocalDateTime
     ): User()
 }

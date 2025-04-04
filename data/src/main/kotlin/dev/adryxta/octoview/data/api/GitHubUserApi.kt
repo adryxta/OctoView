@@ -5,7 +5,6 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType
 import okhttp3.OkHttpClient
-import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import retrofit2.http.GET
@@ -14,13 +13,13 @@ import retrofit2.http.Query
 internal interface GitHubUserApi {
 
     @GET("/users")
-    fun getUsers(
+    suspend fun getUsers(
         @Query("since") lastUserId: Int? = null,
         @Query("per_page") perPage: Int = 30
-    ): Call<List<User>>
+    ): List<User>
 
     @GET("/users/{login}")
-    fun getUserDetail(@Query("login") login: String): Call<UserDetails>
+    suspend fun getUserDetail(@Query("login") login: String): UserDetails
 
     @Serializable
     data class User(
@@ -110,10 +109,16 @@ internal interface GitHubUserApi {
 
     companion object {
 
+        internal val ParseJson = Json {
+            ignoreUnknownKeys = true
+            isLenient = true
+            explicitNulls = false
+        }
+
         private val gitHubConvertorFactories = arrayOf(
             MediaType.get("application/json; charset=UTF8"),
             MediaType.get("application/vnd.github+json"),
-        ).map { Json.asConverterFactory(it) }
+        ).map { ParseJson.asConverterFactory(it) }
 
         fun create(
             baseUrl: String,

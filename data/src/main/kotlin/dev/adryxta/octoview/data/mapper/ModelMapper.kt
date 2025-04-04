@@ -1,11 +1,11 @@
 package dev.adryxta.octoview.data.mapper
 
-import android.icu.text.DateFormat
 import dev.adryxta.octoview.data.api.GitHubUserApi
 import dev.adryxta.octoview.data.model.User
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
-internal val GITHUB_DATE_FORMAT = DateFormat.getPatternInstance("yyyy-MM-dd'T'HH:mm:ss'Z'")
-
+private val GITHUB_DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'")
 
 internal fun GitHubUserApi.User.toModel() = User.Profile(
     id = id,
@@ -31,7 +31,6 @@ internal fun GitHubUserApi.UserDetails.toModel() = User.Details(
     publicRepos = publicRepos,
     publicGists = publicGists,
     twitterUsername = twitterUsername,
-    createAt = GITHUB_DATE_FORMAT.parse(createdAt),
-    updatedAt = GITHUB_DATE_FORMAT.parse(updatedAt)
+    createdAt = LocalDateTime.parse(createdAt, GITHUB_DATE_FORMAT),
+    updatedAt = LocalDateTime.parse(updatedAt, GITHUB_DATE_FORMAT)
 )
-
