@@ -21,4 +21,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "OctoView"
 include(":app")
- 
+include(":data")
