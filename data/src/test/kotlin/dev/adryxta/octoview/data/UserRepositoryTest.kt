@@ -4,108 +4,121 @@ import app.cash.turbine.test
 import dev.adryxta.octoview.data.api.GitHubUserApi
 import dev.adryxta.octoview.data.api.NetworkError
 import dev.adryxta.octoview.data.model.User
-import io.mockk.coEvery
-import io.mockk.coVerify
-import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import org.junit.After
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
+import com.google.common.truth.Truth.assertThat
+import okhttp3.mockwebserver.MockResponse
+import okhttp3.mockwebserver.MockWebServer
+import okhttp3.mockwebserver.SocketPolicy
 import org.junit.Before
 import org.junit.Test
+import java.net.HttpURLConnection
 import java.time.LocalDateTime
 
 class UserRepositoryTest {
 
-    // Mocks
-    private val gitHubUserApi = mockk<GitHubUserApi>()
+    private val mockWebServer = MockWebServer()
+
+    private lateinit var gitHubUserApi: GitHubUserApi
 
     private lateinit var userRepository: UserRepository
 
     @Before
     fun setup() {
+        gitHubUserApi = GitHubUserApi.create(
+            baseUrl = mockWebServer.url("/").toString(),
+            authToken = "",
+        )
         userRepository = DefaultUserRepository(gitHubUserApi)
     }
 
     @After
     fun tearDown() {
+        mockWebServer.shutdown()
     }
 
     @Test
     fun `getUserList returns list of user profiles`() = runTest {
-        // Arrange
-        coEvery { gitHubUserApi.getUsers(any<Int>(), any<Int>()) } returns listOf(GitHubUser1)
+        // setup
+        val response = MockResponse()
+            .setResponseCode(HttpURLConnection.HTTP_OK)
+            .setBody(GitHubUserArrayA)
+        mockWebServer.enqueue(response)
 
-        // Act
-        val result = userRepository.getUserList()
+        // execute
+        val userList = userRepository.getUserList()
 
-        // Assert
-        assertTrue(result.isSuccess)
-        val (userProfile) = requireNotNull(result.getOrNull())
-        assertEquals(1, userProfile.id)
-        assertEquals(null, userProfile.name)
-        assertEquals("octocat", userProfile.login)
-        assertEquals(null, userProfile.email)
-        assertEquals("https://github.com/images/error/octocat_happy.gif", userProfile.avatarUrl)
-        coVerify {
-            gitHubUserApi.getUsers(null)
-        }
+        // verify
+        val userProfile = userList.first()
+        assertThat(userProfile.id).isEqualTo(1)
+        assertThat(userProfile.login).isEqualTo("octocat")
+        assertThat(userProfile.avatarUrl).isEqualTo("https://github.com/images/error/octocat_happy.gif")
     }
 
     @Test
     fun `getUserList with previousUserId passes parameter correctly`() = runTest {
-        // Arrange
+        // setup
         val previousUserId = 42
-        coEvery { gitHubUserApi.getUsers(previousUserId) } returns listOf(GitHubUser2)
+        val response = MockResponse()
+            .setResponseCode(HttpURLConnection.HTTP_OK)
+            .setBody(GithubUserArrayB)
+        mockWebServer.enqueue(response)
 
-        // Act
+        // execute
         val result = userRepository.getUserList(previousUserId)
 
-        // Assert
-        assertTrue(result.isSuccess)
-        coVerify { gitHubUserApi.getUsers(previousUserId) }
+        // verify
+        assertThat(result.first().id).isEqualTo(43)
     }
 
     @Test
     fun `getUserDetails returns user profile first, then details`() = runTest {
         val userLogin = "octocat"
-        // Arrange
-        coEvery { gitHubUserApi.getUsers(any<Int>(), any<Int>()) } returns listOf(GitHubUser1)
-        coEvery { gitHubUserApi.getUserDetail(userLogin) } returns GitHubUser1Details
+        // setup
+        mockWebServer.enqueue(
+            MockResponse()
+                .setResponseCode(HttpURLConnection.HTTP_OK)
+                .setBody(GitHubUserArrayA)
+        )
+        mockWebServer.enqueue(
+            MockResponse()
+                .setResponseCode(HttpURLConnection.HTTP_OK)
+                .setBody(GitHubUserDetailsA)
+        )
 
-        // Act
+        // execute
         userRepository.getUserList()
         val userFlow = userRepository.getUserDetails(userLogin)
 
-        // Assert
-        userFlow.test<User> {
+        // verify
+        userFlow.test {
             // First Profile is emitted
             val profile = awaitItem()
-            assertTrue(profile is User.Profile)
+            assert(profile is User.Profile)
             with(profile as User.Profile) {
                 // Verify non null properties
-                assertEquals(1, id)
-                assertEquals("octocat", login)
-                assertEquals("https://github.com/images/error/octocat_happy.gif", avatarUrl)
+                assertThat(id).isEqualTo(1)
+                assertThat(login).isEqualTo("octocat")
+                assertThat(avatarUrl).isEqualTo("https://github.com/images/error/octocat_happy.gif")
             }
             // Then, Details
             val details = awaitItem()
             assert(details is User.Details)
             with(details as User.Details) {
-                assertEquals("monalisa octocat", details.name)
-                assertEquals("GitHub", company)
-                assertEquals("https://github.com/blog", details.blog)
-                assertEquals("San Francisco", details.location)
-                assertEquals("octocat@github.com", details.email)
-                assertEquals(false, details.hireable)
-                assertEquals("There once was a octocat.", details.bio)
-                assertEquals("monatheoctocat", details.twitterUsername)
-                assertEquals(2, details.publicRepos)
-                assertEquals(1, details.publicGists)
-                assertEquals(20, details.followers)
-                assertEquals(0, details.following)
-                assertEquals(LocalDateTime.of(2008, 1, 12, 5, 35, 35), details.createdAt)
-                assertEquals(LocalDateTime.of(2008, 1, 14, 4, 33, 35), details.updatedAt)
+                assertThat(name).isEqualTo("monalisa octocat")
+                assertThat(company).isEqualTo("GitHub")
+                assertThat(blog).isEqualTo("https://github.com/blog")
+                assertThat(location).isEqualTo("San Francisco")
+                assertThat(email).isEqualTo("octocat@github.com")
+                assertThat(hireable).isEqualTo(false)
+                assertThat(bio).isEqualTo("There once was a octocat.")
+                assertThat(twitterUsername).isEqualTo("monatheoctocat")
+                assertThat(publicRepos).isEqualTo(2)
+                assertThat(publicGists).isEqualTo(1)
+                assertThat(followers).isEqualTo(20)
+                assertThat(following).isEqualTo(0)
+                assertThat(createdAt).isEqualTo(LocalDateTime.of(2008, 1, 12, 5, 35, 35))
+                assertThat(updatedAt).isEqualTo(LocalDateTime.of(2008, 1, 14, 4, 33, 35))
             }
             // Complete
             awaitComplete()
@@ -116,35 +129,39 @@ class UserRepositoryTest {
     @Test
     fun `getUserDetails returns user details if profile is not cached`() = runTest {
         val userLogin = "octocat"
-        // Arrange
-        coEvery { gitHubUserApi.getUserDetail(userLogin) } returns GitHubUser1Details
+        // setup
+        mockWebServer.enqueue(
+            MockResponse()
+                .setResponseCode(HttpURLConnection.HTTP_OK)
+                .setBody(GitHubUserDetailsA)
+        )
 
-        // Act
+        // execute
         val userFlow = userRepository.getUserDetails(userLogin)
 
-        // Assert
-        userFlow.test<User> {
+        // verify
+        userFlow.test {
             // With no cache, Details is emitted directly
             val details = awaitItem()
             assert(details is User.Details)
             with(details as User.Details) {
-                assertEquals(1, id)
-                assertEquals("octocat", login)
-                assertEquals("https://github.com/images/error/octocat_happy.gif", avatarUrl)
-                assertEquals("monalisa octocat", details.name)
-                assertEquals("GitHub", company)
-                assertEquals("https://github.com/blog", details.blog)
-                assertEquals("San Francisco", details.location)
-                assertEquals("octocat@github.com", details.email)
-                assertEquals(false, details.hireable)
-                assertEquals("There once was a octocat.", details.bio)
-                assertEquals("monatheoctocat", details.twitterUsername)
-                assertEquals(2, details.publicRepos)
-                assertEquals(1, details.publicGists)
-                assertEquals(20, details.followers)
-                assertEquals(0, details.following)
-                assertEquals(LocalDateTime.of(2008, 1, 12, 5, 35, 35), details.createdAt)
-                assertEquals(LocalDateTime.of(2008, 1, 14, 4, 33, 35), details.updatedAt)
+                assertThat(id).isEqualTo(1)
+                assertThat(login).isEqualTo("octocat")
+                assertThat(avatarUrl).isEqualTo("https://github.com/images/error/octocat_happy.gif")
+                assertThat(name).isEqualTo("monalisa octocat")
+                assertThat(company).isEqualTo("GitHub")
+                assertThat(blog).isEqualTo("https://github.com/blog")
+                assertThat(location).isEqualTo("San Francisco")
+                assertThat(email).isEqualTo("octocat@github.com")
+                assertThat(hireable).isEqualTo(false)
+                assertThat(bio).isEqualTo("There once was a octocat.")
+                assertThat(twitterUsername).isEqualTo("monatheoctocat")
+                assertThat(publicRepos).isEqualTo(2)
+                assertThat(publicGists).isEqualTo(1)
+                assertThat(followers).isEqualTo(20)
+                assertThat(following).isEqualTo(0)
+                assertThat(createdAt).isEqualTo(LocalDateTime.of(2008, 1, 12, 5, 35, 35))
+                assertThat(updatedAt).isEqualTo(LocalDateTime.of(2008, 1, 14, 4, 33, 35))
             }
             // Complete
             awaitComplete()
@@ -152,29 +169,38 @@ class UserRepositoryTest {
     }
 
     @Test
-    fun `network errors are propagated to calling code`() = runTest {
-        // Arrange
-        coEvery {
-            gitHubUserApi.getUsers(
-                any<Int>(),
-                any<Int>()
-            )
-        } throws NetworkError.HttpError(404, "Not Found")
+    fun `timeout errors are propagated to calling code`() = runTest {
+        // setup
+        mockWebServer.enqueue(MockResponse().setSocketPolicy(SocketPolicy.NO_RESPONSE))
 
-        // Act
-        val result = userRepository.getUserList()
+        // execute
+        try {
+            userRepository.getUserList()
+        } catch (throwable: Throwable) {
+            // verify
+            assert(throwable is NetworkError.Timeout)
+        }
+    }
 
-        // Assert
-        assertTrue(result.isFailure)
-        assertEquals(404, (result.exceptionOrNull() as NetworkError.HttpError).code)
-        assertEquals("Not Found", result.exceptionOrNull()?.message)
-        coVerify { gitHubUserApi.getUsers(null) }
+    @Test
+    fun `http error codes are propagated to calling code`() = runTest {
+        // setup
+        mockWebServer.enqueue(MockResponse().setResponseCode(HttpURLConnection.HTTP_NOT_FOUND))
+
+        // execute
+        try {
+            userRepository.getUserList()
+        } catch (throwable: Throwable) {
+            // verify
+            assert(throwable is NetworkError.Http)
+            assertThat((throwable as NetworkError.Http).code).isEqualTo(HttpURLConnection.HTTP_NOT_FOUND)
+        }
     }
 
     companion object {
 
-        private val GitHubUser1 = GitHubUserApi.ParseJson.decodeFromString<GitHubUserApi.User>(
-            """{
+        private val GitHubUserArrayA = """[
+            {
                 "login": "octocat",
                 "id": 1,
                 "node_id": "MDQ6VXNlcjE=",
@@ -193,12 +219,34 @@ class UserRepositoryTest {
                 "received_events_url": "https://api.github.com/users/octocat/received_events",
                 "type": "User",
                 "site_admin": false
-              }""".trimIndent()
-        )
+              }
+        ]""".trimIndent()
 
-        private val GitHubUser1Details =
-            GitHubUserApi.ParseJson.decodeFromString<GitHubUserApi.UserDetails>(
-                """{
+        private val GithubUserArrayB = """[
+            {
+                "login": "github",
+                "name": "GitHub",
+                "id": 43,
+                "node_id": "MDJDVXNlcjE=",
+                "avatar_url": "https://github.com/images/error/github_happy.gif",
+                "url": "https://api.github.com/users/github",
+                "html_url": "https://github.com/github",
+                "followers_url": "https://api.github.com/users/github/followers",
+                "following_url": "https://api.github.com/users/github/following{/other_user}",
+                "gists_url": "https://api.github.com/users/github/gists{/gist_id}",
+                "starred_url": "https://api.github.com/users/github/starred{/owner}{/repo}",
+                "subscriptions_url": "https://api.github.com/users/github/subscriptions",
+                "organizations_url": "https://api.github.com/users/github/orgs",
+                "repos_url": "https://api.github.com/users/github/repos",
+                "events_url": "https://api.github.com/users/github/events{/privacy}",
+                "received_events_url": "https://api.github.com/users/github/received_events",
+                "type": "User",
+                "site_admin": false
+            }
+        ]""".trimIndent()
+
+        private val GitHubUserDetailsA = """
+            {
                   "login": "octocat",
                   "id": 1,
                   "node_id": "MDQ6VXNlcjE=",
@@ -231,31 +279,7 @@ class UserRepositoryTest {
                   "following": 0,
                   "created_at": "2008-01-12T05:35:35Z",
                   "updated_at": "2008-01-14T04:33:35Z"
-                  }""".trimIndent()
-            )
-
-        private val GitHubUser2 = GitHubUserApi.ParseJson.decodeFromString<GitHubUserApi.User>(
-            """{
-                "login": "github",
-                "name": "GitHub",
-                "id": 43,
-                "node_id": "MDJDVXNlcjE=",
-                "avatar_url": "https://github.com/images/error/github_happy.gif",
-                "url": "https://api.github.com/users/github",
-                "html_url": "https://github.com/github",
-                "followers_url": "https://api.github.com/users/github/followers",
-                "following_url": "https://api.github.com/users/github/following{/other_user}",
-                "gists_url": "https://api.github.com/users/github/gists{/gist_id}",
-                "starred_url": "https://api.github.com/users/github/starred{/owner}{/repo}",
-                "subscriptions_url": "https://api.github.com/users/github/subscriptions",
-                "organizations_url": "https://api.github.com/users/github/orgs",
-                "repos_url": "https://api.github.com/users/github/repos",
-                "events_url": "https://api.github.com/users/github/events{/privacy}",
-                "received_events_url": "https://api.github.com/users/github/received_events",
-                "type": "User",
-                "site_admin": false
-                }
+                  }
         """.trimIndent()
-        )
     }
 }

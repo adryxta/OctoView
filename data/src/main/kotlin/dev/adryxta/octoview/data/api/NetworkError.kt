@@ -1,10 +1,10 @@
 package dev.adryxta.octoview.data.api
 
-import okhttp3.Interceptor as OkHttpInterceptor
 import okhttp3.Response
-import retrofit2.HttpException
+import java.io.IOException
+import okhttp3.Interceptor as OkHttpInterceptor
 
-sealed class NetworkError: Throwable() {
+sealed class NetworkError : IOException() {
 
     class Connection(override val message: String) : NetworkError()
 
@@ -12,27 +12,31 @@ sealed class NetworkError: Throwable() {
 
     class RateLimit(override val message: String) : NetworkError()
 
-    class HttpError(val code: Int, override val message: String) : NetworkError()
+    class Http(val code: Int, override val message: String) : NetworkError()
 
-    class UnknownError(override val message: String) : NetworkError()
+    class Unknown(override val message: String) : NetworkError()
 
-    internal object Interceptor: OkHttpInterceptor {
+    internal object Interceptor : OkHttpInterceptor {
         override fun intercept(chain: OkHttpInterceptor.Chain): Response {
-            try {
-                return chain.proceed(chain.request())
-            } catch (httpException: HttpException) {
-                throw when(httpException.code()) {
-                    403, 429 -> RateLimit("Rate limit exceeded")
-                    in 400..599 -> HttpError(httpException.code(), httpException.message())
-                    else -> UnknownError("Unknown Response: ${httpException.message}")
-                }
+            val response = try {
+                chain.proceed(chain.request())
             } catch (ioException: Exception) {
                 throw when (ioException) {
                     is java.net.SocketTimeoutException -> Timeout("Timeout Error: ${ioException.message}")
                     else -> Connection("Connection Error: ${ioException.message}")
                 }
             } catch (throwable: Throwable) {
-                throw UnknownError("Unknown Error: ${throwable.message}")
+                throw Unknown("Unknown Error: ${throwable.message}")
+            }
+
+            if (response.isSuccessful) {
+                return response
+            }
+
+            throw when (response.code) {
+                403, 429 -> RateLimit("Rate limit exceeded")
+                in 400..599 -> Http(response.code, response.message)
+                else -> Unknown("Unknown Response: ${response.message}")
             }
         }
     }

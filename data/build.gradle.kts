@@ -58,6 +58,7 @@ dependencies {
     testImplementation(libs.mockk.agent)
     testImplementation(libs.turbine)
     testImplementation(libs.truth)
+    testImplementation(libs.mockwebserver)
     testImplementation(libs.kotlinx.coroutines.test)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

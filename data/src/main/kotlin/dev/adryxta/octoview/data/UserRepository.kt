@@ -3,8 +3,11 @@ package dev.adryxta.octoview.data
 import dev.adryxta.octoview.data.api.GitHubUserApi
 import dev.adryxta.octoview.data.mapper.toModel
 import dev.adryxta.octoview.data.model.User
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -12,7 +15,7 @@ typealias UserLogin = String
 
 interface UserRepository {
 
-    suspend fun getUserList(previousUserId: Int? = null): Result<List<User.Profile>>
+    suspend fun getUserList(previousUserId: Int? = null): List<User.Profile>
 
     fun getUserDetails(login: UserLogin): Flow<User>
 }
@@ -23,18 +26,11 @@ internal class DefaultUserRepository @Inject constructor(
 
     private val userProfileCache = mutableMapOf<UserLogin, User.Profile>()
 
-    override suspend fun getUserList(previousUserId: Int?): Result<List<User.Profile>> {
-        try {
+    override suspend fun getUserList(previousUserId: Int?): List<User.Profile> = withContext(Dispatchers.IO) {
             val users = gitHubUserApi.getUsers(previousUserId)
             val profileModels = users.map { it.toModel() }
             userProfileCache.putAll(profileModels.associateBy { it.login })
-            return Result.success(profileModels).also {
-                Timber.d("Returned user list: $profileModels")
-            }
-        } catch (throwable: Throwable) {
-            Timber.e(throwable, "Failed to get user list")
-            return Result.failure(throwable)
-        }
+            return@withContext profileModels.also { Timber.d("Returned User List: $profileModels") }
     }
 
     override fun getUserDetails(login: UserLogin): Flow<User> = flow {
@@ -54,5 +50,5 @@ internal class DefaultUserRepository @Inject constructor(
             Timber.e(throwable, "Failed to get user details for $login")
             throw throwable
         }
-    }
+    }.flowOn(Dispatchers.IO)
 }
