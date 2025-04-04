@@ -3,6 +3,7 @@ package dev.adryxta.octoview.ui.list
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.runtime.Composable
@@ -16,15 +17,14 @@ import dev.adryxta.octoview.ui.common.LoadingItem
 fun UserList(
     modifier: Modifier,
     users: List<User.Profile>,
-    isLoading: Boolean,
     onClick: (user: User.Profile) -> Unit,
+    fetchMore: () -> Unit,
 ) {
     LazyVerticalGrid(
         modifier = modifier
             .padding(20.dp),
         columns = GridCells.Fixed(2),
         horizontalArrangement = Arrangement.SpaceEvenly,
-        verticalArrangement = Arrangement.SpaceEvenly,
     ) {
         items(users) { user ->
             UserCard(
@@ -33,12 +33,11 @@ fun UserList(
                 onClick = { onClick(user) }
             )
         }
-        item {
-            if (isLoading) {
-                LoadingItem()
-            }
+        item(span = { GridItemSpan(2) }) {
+            LoadingItem(onVisible = { fetchMore() })
         }
     }
+
 }
 
 @Preview(showBackground = true)
@@ -78,7 +77,7 @@ private fun UserListScreenPreview() {
             )
         ),
         onClick = {},
-        isLoading = true,
-        modifier = Modifier.padding(20.dp) // Add padding to the preview
+        modifier = Modifier.padding(20.dp), // Add padding to the preview,
+        fetchMore = {}
     )
 }

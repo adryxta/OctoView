@@ -17,7 +17,8 @@ import dev.adryxta.octoview.ui.common.TopBar
 @Composable
 fun ListScreen(
     uiState: ListUiState,
-    onProfileClick: (login: User.Profile) -> Unit
+    onProfileClick: (login: User.Profile) -> Unit,
+    fetchMore: () -> Unit,
 ) {
 
     Scaffold(
@@ -47,7 +48,7 @@ fun ListScreen(
                         onClick = { user ->
                             onProfileClick(user)
                         },
-                        isLoading = uiState.isLoading,
+                        fetchMore = fetchMore,
                     )
                 }
             }

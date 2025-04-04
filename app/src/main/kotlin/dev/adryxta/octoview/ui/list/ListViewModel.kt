@@ -50,7 +50,7 @@ class ListViewModel @Inject internal constructor(
         loadUsers()
     }
 
-    private fun loadUsers() {
+    fun loadUsers() {
         if (viewModelState.value.isLoading) return
         viewModelState.update { it.copy(isLoading = true) }
         viewModelScope.launch {
@@ -63,7 +63,7 @@ class ListViewModel @Inject internal constructor(
                     it.copy(
                         isLoading = false,
                         users = it.users.toMutableList().apply { addAll(result.getOrThrow()) },
-                        lastId = result.getOrThrow().lastIndex
+                        lastId = result.getOrThrow().size.plus(it.lastId?: 0)
                     ) }
             }
         }

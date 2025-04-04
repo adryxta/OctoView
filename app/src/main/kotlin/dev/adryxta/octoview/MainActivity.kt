@@ -43,8 +43,9 @@ class MainActivity : ComponentActivity() {
                                     login = profile.login,
                                     avatarUrl = profile.avatarUrl
                                 )
-                            )
-                        })
+                            ) },
+                            fetchMore = {listViewModel.loadUsers()}
+                        )
                     }
                     composable<Routes.Details> { backStackEntry ->
                         val (_) = backStackEntry.toRoute<Routes.Details>()
