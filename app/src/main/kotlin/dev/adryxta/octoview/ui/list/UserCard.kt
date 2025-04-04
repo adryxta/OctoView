@@ -7,9 +7,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -29,20 +28,15 @@ fun UserCard(
     onClick: () -> Unit,
 ) {
     Card(
-        shape = RoundedCornerShape(20.dp),
+        shape = MaterialTheme.shapes.large,
         modifier = Modifier
             .padding(10.dp)
             .wrapContentSize(align = Alignment.Center)
-            .clickable{
+            .clickable {
                 onClick.invoke()
             },
-        elevation = CardDefaults.elevatedCardElevation(
-            defaultElevation = 10.dp,
-            pressedElevation = 5.dp,
-            hoveredElevation = 15.dp,
-        )
 
-    ) {
+        ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceAround,

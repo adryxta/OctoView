@@ -37,14 +37,15 @@ class MainActivity : ComponentActivity() {
                         ListScreen(
                             uiState = state,
                             onProfileClick = { profile ->
-                            navController.navigate(
-                                Routes.Details(
-                                    id = profile.id,
-                                    login = profile.login,
-                                    avatarUrl = profile.avatarUrl
+                                navController.navigate(
+                                    Routes.Details(
+                                        id = profile.id,
+                                        login = profile.login,
+                                        avatarUrl = profile.avatarUrl
+                                    )
                                 )
-                            ) },
-                            fetchMore = {listViewModel.loadUsers()},
+                            },
+                            fetchMore = { listViewModel.loadUsers() },
                             onRefresh = { listViewModel.reload() },
                         )
                     }

@@ -1,19 +1,22 @@
 package dev.adryxta.octoview.ui.list
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import dev.adryxta.octoview.R
 import dev.adryxta.octoview.data.model.User
-import dev.adryxta.octoview.ui.common.TopBar
+import dev.adryxta.octoview.ui.common.ErrorItem
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ListScreen(
     uiState: ListUiState,
@@ -21,11 +24,13 @@ fun ListScreen(
     fetchMore: () -> Unit,
     onRefresh: () -> Unit,
 ) {
-
     Scaffold(
         topBar = {
-            TopBar(
-                title = "GitHub Users",
+            CenterAlignedTopAppBar(
+                title = {
+                    Text(
+                        text = "GitHub Users"
+                    ) },
                 navigationIcon = {
                     Icon(
                         painter = painterResource(R.drawable.github_mark),
@@ -59,11 +64,27 @@ fun ListScreen(
     )
 }
 
+@Preview
 @Composable
-fun ErrorItem(
-    message: String,
-) {
-    Box{
-        Text(text = message)
-    }
+private fun ListScreenPreview() {
+    ListScreen(
+        uiState = ListUiState.Success(
+            users = listOf(
+                User.Profile(
+                    id = 1,
+                    login = "adryxta",
+                    avatarUrl = "https://avatars.githubusercontent.com/u/1234567?v=4",
+                ),
+                User.Profile(
+                    id = 2,
+                    login = "octocat",
+                    avatarUrl = "https://avatars.githubusercontent.com/u/1234567?v=4",
+                ),
+            ),
+            isLoading = false,
+        ),
+        onProfileClick = { },
+        fetchMore = { },
+        onRefresh = { },
+    )
 }

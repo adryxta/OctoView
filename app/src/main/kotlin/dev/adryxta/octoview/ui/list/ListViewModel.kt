@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import dev.adryxta.octoview.data.UserRepository
 import dev.adryxta.octoview.data.model.User
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -44,7 +45,7 @@ class ListViewModel @Inject internal constructor(
         .map { it.toUiState() }
         .stateIn(
             scope = viewModelScope,
-            started = kotlinx.coroutines.flow.SharingStarted.WhileSubscribed(5_000),
+            started = SharingStarted.Eagerly,
             initialValue = viewModelState.value.toUiState()
         )
 
@@ -70,15 +71,14 @@ class ListViewModel @Inject internal constructor(
             runCatching {
                 userRepository.getUserList(viewModelState.value.lastId)
             }.onFailure {
-                viewModelState.update { it.copy(isLoading = false, error = it.error) }
+                viewModelState.update { it.copy(error = it.error) }
             }.onSuccess { result ->
                 viewModelState.update {
                     it.copy(
-                        isLoading = false,
                         users = it.users.toMutableList().apply { addAll(result.getOrThrow()) },
                         lastId = result.getOrThrow().size.plus(it.lastId?: 0)
                     ) }
-            }
+            }.also { viewModelState.update { it.copy(isLoading = false) } }
         }
     }
 }
