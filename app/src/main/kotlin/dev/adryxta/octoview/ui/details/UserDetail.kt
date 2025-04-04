@@ -5,10 +5,12 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
@@ -46,140 +48,144 @@ fun UserDetail(
     onClickMail: () -> Unit = {},
     onClickX: () -> Unit = {},
 ) {
-    Column(
+    LazyVerticalGrid(
+        columns = GridCells.Adaptive(minSize = 360.dp),
         modifier = Modifier
-            .fillMaxSize()
+            .fillMaxHeight()
             .padding(16.dp)
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Box(modifier = Modifier.padding(16.dp)) {
-                AsyncImage(
-                    model = profile.avatarUrl,
-                    contentDescription = stringResource(R.string.cd_avatar),
+        item {
+            Column {
+                Row(
                     modifier = Modifier
-                        .clip(CircleShape)
-                        .size(150.dp)
-                )
-            }
-            if (details != null) {
-                UserDetailTopGridComponent(details)
-            }
-
-        }
-        details?.name?.let {
-            Text(
-                text = it,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                maxLines = 1,
-            )
-        }
-        details?.bio?.let {
-            Text(
-                text = it,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 5.dp),
-            )
-        }
-        details?.company?.let {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .padding(horizontal = 16.dp, vertical = 5.dp)
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.office),
-                    contentDescription = stringResource(R.string.cd_ic_office),
-                )
-                Text(
-                    text = it,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 5.dp),
-                    maxLines = 1,
-                )
-            }
-        }
-        details?.location?.let {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .padding(horizontal = 16.dp, vertical = 5.dp)
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.location),
-                    contentDescription = stringResource(R.string.cd_ic_location),
-                )
-                Text(
-                    text = it,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 5.dp),
-                    maxLines = 1,
-                )
-            }
-        }
-        details?.blog?.takeIf { it.isNotEmpty() }?.let { //removes both null and empty blogs value
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .padding(horizontal = 16.dp, vertical = 5.dp)
-                    .clickable {
-                        onClickBlog.invoke()
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Box(modifier = Modifier.padding(16.dp)) {
+                        AsyncImage(
+                            model = profile.avatarUrl,
+                            contentDescription = stringResource(R.string.cd_avatar),
+                            modifier = Modifier
+                                .clip(CircleShape)
+                                .size(164.dp)
+                        )
                     }
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.link),
-                    contentDescription = stringResource(R.string.cd_ic_link),
-                )
-                Text(
-                    text = it,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 5.dp),
-                    maxLines = 1,
-                )
+                    if (details != null) {
+                        UserDetailTopGridComponent(details)
+                    }
+                }
+                details?.name?.let {
+                    Text(
+                        text = it,
+                        modifier = Modifier
+                            .padding(16.dp),
+                        maxLines = 1,
+                    )
+                }
             }
         }
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            details?.email?.let {
-                IconButton(
-                    onClick = onClickMail,
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_mail),
-                        contentDescription = stringResource(R.string.cd_ic_mail),
+        item {
+            Column {
+                details?.bio?.let {
+                    Text(
+                        text = it,
+                        modifier = Modifier
+                            .padding(horizontal = 16.dp, vertical = 5.dp),
                     )
                 }
-            }
-            details?.twitterUsername?.let {
-                IconButton(
-                    onClick = onClickX,
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_twitter_x),
-                        contentDescription = stringResource(R.string.cd_ic_x),
-                    )
+                details?.company?.let {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .padding(horizontal = 16.dp, vertical = 5.dp)
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.office),
+                            contentDescription = stringResource(R.string.cd_ic_office),
+                        )
+                        Text(
+                            text = it,
+                            modifier = Modifier
+                                .padding(horizontal = 16.dp, vertical = 5.dp),
+                            maxLines = 1,
+                        )
+                    }
                 }
-            }
-            details?.hireable?.let {
-                Icon(
-                    painter = painterResource(R.drawable.online),
-                    contentDescription = stringResource(R.string.cd_ic_hire),
-                    modifier = Modifier.padding(start = 16.dp, end = 5.dp),
-                    tint = Color.Green
-                )
-                Text(
-                    text = stringResource(R.string.hireable_text),
-                )
+                details?.location?.let {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .padding(horizontal = 16.dp, vertical = 5.dp)
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.location),
+                            contentDescription = stringResource(R.string.cd_ic_location),
+                        )
+                        Text(
+                            text = it,
+                            modifier = Modifier
+                                .padding(horizontal = 16.dp, vertical = 5.dp),
+                            maxLines = 1,
+                        )
+                    }
+                }
+                details?.blog?.takeIf { it.isNotEmpty() }
+                    ?.let { //removes both null and empty blogs value
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                                .padding(horizontal = 16.dp, vertical = 5.dp)
+                                .clickable {
+                                    onClickBlog.invoke()
+                                }
+                        ) {
+                            Icon(
+                                painter = painterResource(R.drawable.link),
+                                contentDescription = stringResource(R.string.cd_ic_link),
+                            )
+                            Text(
+                                text = it,
+                                modifier = Modifier
+                                    .padding(horizontal = 16.dp, vertical = 5.dp),
+                                maxLines = 1,
+                            )
+                        }
+                    }
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    details?.email?.let {
+                        IconButton(
+                            onClick = onClickMail,
+                        ) {
+                            Icon(
+                                painter = painterResource(R.drawable.ic_mail),
+                                contentDescription = stringResource(R.string.cd_ic_mail),
+                            )
+                        }
+                    }
+                    details?.twitterUsername?.let {
+                        IconButton(
+                            onClick = onClickX,
+                        ) {
+                            Icon(
+                                painter = painterResource(R.drawable.ic_twitter_x),
+                                contentDescription = stringResource(R.string.cd_ic_x),
+                            )
+                        }
+                    }
+                    details?.hireable?.let {
+                        Icon(
+                            painter = painterResource(R.drawable.online),
+                            contentDescription = stringResource(R.string.cd_ic_hire),
+                            modifier = Modifier.padding(start = 16.dp, end = 5.dp),
+                            tint = Color.Green
+                        )
+                        Text(
+                            text = stringResource(R.string.hireable_text),
+                        )
+                    }
+                }
             }
         }
     }
@@ -189,46 +195,48 @@ fun UserDetail(
 fun UserDetailTopGridComponent(
     details: User.Details
 ) {
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(2),
+    Column(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp),
+            .fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        item {
+        Row {
             GridSegment(
                 counter = formatFollowersCount(details.followers),
-                label = stringResource(R.string.user_followers)
+                label = stringResource(R.string.user_followers),
             )
-        }
-        item {
             GridSegment(
                 counter = formatFollowersCount(details.following),
-                label = stringResource(R.string.user_following)
+                label = stringResource(R.string.user_following),
             )
         }
-        item {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+        ) {
             GridSegment(
                 counter = formatFollowersCount(details.publicRepos),
                 label = stringResource(R.string.user_repos)
             )
-        }
-        item {
             GridSegment(
                 counter = formatFollowersCount(details.publicGists),
                 label = stringResource(R.string.user_gists)
             )
         }
+
     }
 }
 
 @Composable
-fun GridSegment(
+fun RowScope.GridSegment(
     counter: String,
     label: String,
 ) {
     Column(
-        modifier = Modifier.padding(8.dp),
+        modifier = Modifier
+            .padding(8.dp)
+            .weight(1f),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
@@ -239,33 +247,10 @@ fun GridSegment(
         Text(
             text = label,
             style = MaterialTheme.typography.bodyMedium,
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Center,
+            softWrap = false
         )
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun UserDetailLoadingPreview() {
-    UserDetail(
-        profile = User.Profile(
-            id = 1,
-            login = "octocat",
-            avatarUrl = "https://avatars.githubusercontent.com/u/1?v=4",
-        )
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun UserDetailErrorPreview() {
-    UserDetail(
-        profile = User.Profile(
-            id = 1,
-            login = "octocat",
-            avatarUrl = "https://avatars.githubusercontent.com/u/1?v=4",
-        )
-    )
 }
 
 @Preview(showBackground = true)
