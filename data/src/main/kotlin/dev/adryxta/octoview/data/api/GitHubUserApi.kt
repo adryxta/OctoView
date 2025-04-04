@@ -1,5 +1,6 @@
 package dev.adryxta.octoview.data.api
 
+import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
@@ -8,8 +9,10 @@ import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import retrofit2.http.GET
+import retrofit2.http.Path
 import retrofit2.http.Query
 
+@OptIn(InternalSerializationApi::class)
 internal interface GitHubUserApi {
 
     @GET("/users")
@@ -19,7 +22,7 @@ internal interface GitHubUserApi {
     ): List<User>
 
     @GET("/users/{login}")
-    suspend fun getUserDetail(@Query("login") login: String): UserDetails
+    suspend fun getUserDetail(@Path("login") login: String): UserDetails
 
     @Serializable
     data class User(

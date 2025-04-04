@@ -29,9 +29,8 @@ class MainActivity : ComponentActivity() {
                         })
                     }
                     composable<Routes.Details> { backStackEntry ->
-                        val (login) = backStackEntry.toRoute<Routes.Details>()
+                        val (_) = backStackEntry.toRoute<Routes.Details>()
                         DetailsScreen(
-                            login = login,
                             onBackClick = { navController.popBackStack() }
                         )
                     }
