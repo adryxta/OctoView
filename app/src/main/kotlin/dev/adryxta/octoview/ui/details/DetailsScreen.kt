@@ -16,6 +16,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -58,7 +59,7 @@ fun DetailsScreen(
                     .fillMaxWidth(),
                 content = {
                     Text(
-                        text = "Visit Profile On Web",
+                        text = stringResource(R.string.visit_profile_button_text),
                         textAlign = TextAlign.Center,
                         modifier = Modifier
                             .fillMaxWidth()
@@ -71,8 +72,7 @@ fun DetailsScreen(
             Box(modifier = Modifier.padding(it)) {
                 when (uiState) {
                     is DetailUiState.Error -> ErrorItem(
-                        message = (uiState as DetailUiState.Error).error?.message
-                            ?: "Unknown error",
+                        errorCode = (uiState as DetailUiState.Error).error
                     )
 
                     is DetailUiState.Success -> {

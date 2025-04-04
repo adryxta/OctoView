@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import dev.adryxta.octoview.R
@@ -30,15 +31,16 @@ fun ListScreen(
             CenterAlignedTopAppBar(
                 title = {
                     Text(
-                        text = "GitHub Users"
-                    ) },
+                        text = stringResource(R.string.main_screen_title)
+                    )
+                },
                 navigationIcon = {
                     Icon(
                         painter = painterResource(R.drawable.github_mark),
                         modifier = Modifier
                             .size(56.dp)
                             .padding(12.dp),
-                        contentDescription = null,
+                        contentDescription = stringResource(R.string.cd_ic_github),
                     )
                 },
                 modifier = Modifier.shadow(4.dp)
@@ -47,8 +49,11 @@ fun ListScreen(
         content = {
             when (uiState) {
                 is ListUiState.Error -> ErrorItem(
-                    message = uiState.error?.message?: "Unknown error",
+                    errorCode = uiState.error,
+                    canRetry = true,
+                    onRetry = onRefresh,
                 )
+
                 is ListUiState.Success -> {
                     UserList(
                         modifier = Modifier.padding(it),

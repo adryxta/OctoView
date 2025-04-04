@@ -18,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -50,7 +51,7 @@ fun UserCard(
         ) {
             AsyncImage(
                 model = userAvatarUrl,
-                contentDescription = null,
+                contentDescription = stringResource(R.string.cd_avatar),
                 placeholder = painterResource(R.drawable.ic_avatar_placeholder),
                 error = painterResource(R.drawable.ic_avatar_placeholder),
                 modifier = Modifier

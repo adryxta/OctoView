@@ -22,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -29,6 +30,7 @@ import coil3.compose.AsyncImage
 import dev.adryxta.octoview.R
 import dev.adryxta.octoview.data.model.User
 import java.time.LocalDateTime
+import java.util.Locale
 
 @Composable
 fun UserDetail(
@@ -57,7 +59,7 @@ fun UserDetail(
             Box(modifier = Modifier.padding(16.dp)) {
                 AsyncImage(
                     model = profile.avatarUrl,
-                    contentDescription = "avatar",
+                    contentDescription = stringResource(R.string.cd_avatar),
                     modifier = Modifier
                         .clip(CircleShape)
                         .size(150.dp)
@@ -93,7 +95,7 @@ fun UserDetail(
             ) {
                 Icon(
                     painter = painterResource(R.drawable.office),
-                    contentDescription = null,
+                    contentDescription = stringResource(R.string.cd_ic_office),
                 )
                 Text(
                     text = it,
@@ -112,7 +114,7 @@ fun UserDetail(
             ) {
                 Icon(
                     painter = painterResource(R.drawable.location),
-                    contentDescription = null,
+                    contentDescription = stringResource(R.string.cd_ic_location),
                 )
                 Text(
                     text = it,
@@ -134,7 +136,7 @@ fun UserDetail(
             ) {
                 Icon(
                     painter = painterResource(R.drawable.link),
-                    contentDescription = null,
+                    contentDescription = stringResource(R.string.cd_ic_link),
                 )
                 Text(
                     text = it,
@@ -154,7 +156,7 @@ fun UserDetail(
                 ) {
                     Icon(
                         painter = painterResource(R.drawable.ic_mail),
-                        contentDescription = null,
+                        contentDescription = stringResource(R.string.cd_ic_mail),
                     )
                 }
             }
@@ -164,19 +166,19 @@ fun UserDetail(
                 ) {
                     Icon(
                         painter = painterResource(R.drawable.ic_twitter_x),
-                        contentDescription = null,
+                        contentDescription = stringResource(R.string.cd_ic_x),
                     )
                 }
             }
             details?.hireable?.let {
                 Icon(
                     painter = painterResource(R.drawable.online),
-                    contentDescription = null,
+                    contentDescription = stringResource(R.string.cd_ic_hire),
                     modifier = Modifier.padding(start = 16.dp, end = 5.dp),
                     tint = Color.Green
                 )
                 Text(
-                    text = "Available for hire",
+                    text = stringResource(R.string.hireable_text),
                 )
             }
         }
@@ -196,25 +198,25 @@ fun UserDetailTopGridComponent(
         item {
             GridSegment(
                 counter = formatFollowersCount(details.followers),
-                label = "Followers"
+                label = stringResource(R.string.user_followers)
             )
         }
         item {
             GridSegment(
                 counter = formatFollowersCount(details.following),
-                label = "Following"
+                label = stringResource(R.string.user_following)
             )
         }
         item {
             GridSegment(
                 counter = formatFollowersCount(details.publicRepos),
-                label = "Public Repos"
+                label = stringResource(R.string.user_repos)
             )
         }
         item {
             GridSegment(
                 counter = formatFollowersCount(details.publicGists),
-                label = "Public Gists"
+                label = stringResource(R.string.user_gists)
             )
         }
     }
@@ -299,8 +301,18 @@ private fun UserDetailPreview() {
 
 fun formatFollowersCount(count: Int): String {
     return when {
-        count >= 1_000_000 -> String.format("%.1fM", count / 1_000_000.0)
-        count >= 1_000 -> String.format("%.1fK", count / 1_000.0)
+        count >= 1_000_000 -> String.format(
+            locale = Locale.UK,
+            format = "%.1fM",
+            count / 1_000_000.0
+        )
+
+        count >= 1_000 -> String.format(
+            locale = Locale.UK,
+            format = "%.1fK",
+            count / 1_000.0
+        )
+
         else -> count.toString()
     }
 }

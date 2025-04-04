@@ -8,6 +8,8 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.adryxta.octoview.data.UserRepository
 import dev.adryxta.octoview.data.model.User
+import dev.adryxta.octoview.utils.ErrorCode
+import dev.adryxta.octoview.utils.errorCode
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.collectLatest
@@ -26,7 +28,7 @@ sealed interface DetailUiState {
     ) : DetailUiState
 
     data class Error(
-        val error: Throwable?
+        val error: ErrorCode
     ) : DetailUiState
 }
 
@@ -37,7 +39,7 @@ internal data class DetailsViewModelState(
     val error: Throwable? = null,
 ) {
     fun toUiState(): DetailUiState = when {
-        error != null -> DetailUiState.Error(error)
+        error != null -> DetailUiState.Error(error.errorCode())
         else -> DetailUiState.Success(isLoading, profile, details)
     }
 }
@@ -50,9 +52,9 @@ class DetailsViewModel @Inject constructor(
 
     val profile = with(savedStateHandle) {
         User.Profile(
-            id = savedStateHandle.require<Int>("id"),
-            login = savedStateHandle.require<String>("login"),
-            avatarUrl = savedStateHandle.require<String>("avatarUrl")
+            id = savedStateHandle.require("id"),
+            login = savedStateHandle.require("login"),
+            avatarUrl = savedStateHandle.require("avatarUrl")
         )
     }
 
@@ -66,18 +68,7 @@ class DetailsViewModel @Inject constructor(
             initialValue = viewModelState.value.toUiState()
         )
 
-//    private val _uiState = MutableStateFlow(UiState(profile = profile))
-//    val uiState: StateFlow<UiState>
-//        get() = _uiState.asStateFlow()
-
     init {
-//        userRepository.getUserDetails(profile.login).onEach { user ->
-//            Timber.d("User ${profile.login}: $user")
-//            when (user) {
-//                is User.Profile -> _uiState.update { it.copy(profile = user) }
-//                is User.Details -> _uiState.update { it.copy(details = user) }
-//            }
-//        }.launchIn(viewModelScope)
         fetchDetails()
     }
 

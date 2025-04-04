@@ -5,6 +5,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dev.adryxta.octoview.data.UserRepository
 import dev.adryxta.octoview.data.model.User
+import dev.adryxta.octoview.utils.ErrorCode
+import dev.adryxta.octoview.utils.errorCode
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
@@ -18,8 +20,9 @@ sealed interface ListUiState {
         val isLoading: Boolean,
         val users: List<User.Profile>,
     ) : ListUiState
+
     data class Error(
-        val error: Throwable?
+        val error: ErrorCode,
     ) : ListUiState
 }
 
@@ -30,7 +33,7 @@ internal data class ListViewModelState(
     val lastId: Int? = null,
 ) {
     fun toUiState(): ListUiState = when {
-        error != null -> ListUiState.Error(error)
+        error != null -> ListUiState.Error(error.errorCode())
         else -> ListUiState.Success(isLoading, users)
     }
 }

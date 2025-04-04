@@ -1,3 +1,24 @@
 <resources>
     <string name="app_name">OctoView</string>
+    <string name="main_screen_title">GitHub Users</string>
+    <string name="visit_profile_button_text">Visit Profile On Web</string>
+    <string name="user_followers">Followers</string>
+    <string name="user_following">Following</string>
+    <string name="user_repos">Repos</string>
+    <string name="user_gists">Gists</string>
+    <string name="hireable_text">Available for hire</string>
+    <string name="retry">Retry</string>
+    <string name="connection_error">A connection error has occurred.</string>
+    <string name="timeout_error">The network took too long to respond.</string>
+    <string name="rate_limit_error">The API Rate Limit has been reached. Please try after some time.</string>
+    <string name="http_error">The server sent an unexpected response.</string>
+    <string name="unknown_error">Unknown error has occurred.</string>
+    <string name="cd_avatar">Profile Picture</string>
+    <string name="cd_ic_office">Office Icon</string>
+    <string name="cd_ic_location">Location Icon</string>
+    <string name="cd_ic_link">Link Icon</string>
+    <string name="cd_ic_mail">Email Icon</string>
+    <string name="cd_ic_x">X(former Twitter) Icon</string>
+    <string name="cd_ic_hire">Available for hire flag Icon</string>
+    <string name="cd_ic_github">GitHub Icon</string>
 </resources>

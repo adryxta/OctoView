@@ -10,11 +10,15 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import dev.adryxta.octoview.R
+import dev.adryxta.octoview.utils.ErrorCode
+import dev.adryxta.octoview.utils.errorMessage
 
 @Composable
 fun ErrorItem(
-    message: String,
+    errorCode: ErrorCode,
     canRetry: Boolean = false,
     onRetry: () -> Unit = {},
 ) {
@@ -26,12 +30,14 @@ fun ErrorItem(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
         ) {
-            Text(message)
+            Text(
+                text = errorCode.errorMessage()
+            )
             if (canRetry) {
                 Button(
                     onClick = onRetry,
                 ) {
-                    Text("Retry")
+                    Text(stringResource(R.string.retry))
                 }
             }
         }
