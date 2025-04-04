@@ -3,7 +3,6 @@ package dev.adryxta.octoview.ui.common
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.windowInsetsPadding
@@ -33,8 +32,7 @@ fun TopBar(
         Text(
             text = title,
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(5.dp),
+                .fillMaxWidth(),
             textAlign = TextAlign.Center,
             lineHeight = 56.sp,
         )
