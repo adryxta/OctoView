@@ -1,41 +1,71 @@
 package dev.adryxta.octoview.ui.list
 
-import androidx.lifecycle.SavedStateHandle
+import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.adryxta.octoview.data.UserRepository
 import dev.adryxta.octoview.data.model.User
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-@HiltViewModel
-class ListViewModel @Inject constructor(
-    private val savedStateHandle: SavedStateHandle,
+sealed interface ListUiState {
+    data class Success(
+        val isLoading: Boolean,
+        val users: List<User.Profile>,
+    ) : ListUiState
+    data class Error(val message: String) : ListUiState
+}
+
+internal data class ListViewModelState(
+    val isLoading: Boolean = false,
+    val users: List<User.Profile> = emptyList(),
+    val error: String? = null,
+    val lastId: Int? = null,
+) {
+    fun toUiState(): ListUiState = when {
+        error != null -> ListUiState.Error(error)
+        else -> ListUiState.Success(isLoading, users)
+    }
+}
+
+class ListViewModel @Inject internal constructor(
     private val userRepository: UserRepository
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(UiState())
-    val uiState: StateFlow<UiState>
-        get() = _uiState.asStateFlow()
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    private val viewModelState = MutableStateFlow(ListViewModelState())
+    val uiState = viewModelState
+        .map { it.toUiState() }
+        .stateIn(
+            scope = viewModelScope,
+            started = kotlinx.coroutines.flow.SharingStarted.WhileSubscribed(5_000),
+            initialValue = viewModelState.value.toUiState()
+        )
 
     init {
+        loadUsers()
+    }
+
+    private fun loadUsers() {
+        if (viewModelState.value.isLoading) return
+        viewModelState.update { it.copy(isLoading = true) }
         viewModelScope.launch {
-            val result = userRepository.getUserList()
-            if (result.isSuccess) {
-                _uiState.value = UiState(users = result.getOrThrow())
-            } else {
-                _uiState.value = UiState(error = result.exceptionOrNull()?.message)
+            runCatching {
+                userRepository.getUserList(viewModelState.value.lastId)
+            }.onFailure {
+                viewModelState.update { it.copy(isLoading = false, error = it.error) }
+            }.onSuccess { result ->
+                viewModelState.update {
+                    it.copy(
+                        isLoading = false,
+                        users = it.users.toMutableList().apply { addAll(result.getOrThrow()) },
+                        lastId = result.getOrThrow().lastIndex
+                    ) }
             }
         }
     }
-
-    data class UiState(
-        val isLoading: Boolean = false,
-        val users: List<User.Profile> = emptyList(),
-        val error: String? = null
-    )
 }

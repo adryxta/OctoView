@@ -4,6 +4,8 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -11,11 +13,18 @@ import androidx.navigation.toRoute
 import dagger.hilt.android.AndroidEntryPoint
 import dev.adryxta.octoview.ui.details.DetailsScreen
 import dev.adryxta.octoview.ui.list.ListScreen
+import dev.adryxta.octoview.ui.list.ListUiState
+import dev.adryxta.octoview.ui.list.ListViewModel
 import dev.adryxta.octoview.ui.theme.OctoViewTheme
 import kotlinx.serialization.Serializable
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    @Inject
+    lateinit var listViewModel: ListViewModel
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -24,7 +33,10 @@ class MainActivity : ComponentActivity() {
             OctoViewTheme {
                 NavHost(navController = navController, startDestination = Routes.List) {
                     composable<Routes.List> {
-                        ListScreen(onProfileClick = { profile ->
+                        val state: ListUiState by listViewModel.uiState.collectAsState()
+                        ListScreen(
+                            uiState = state,
+                            onProfileClick = { profile ->
                             navController.navigate(
                                 Routes.Details(
                                     id = profile.id,
