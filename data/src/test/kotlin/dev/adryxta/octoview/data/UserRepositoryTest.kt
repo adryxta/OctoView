@@ -2,6 +2,7 @@ package dev.adryxta.octoview.data
 
 import app.cash.turbine.test
 import dev.adryxta.octoview.data.api.GitHubUserApi
+import dev.adryxta.octoview.data.api.NetworkError
 import dev.adryxta.octoview.data.model.User
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -148,6 +149,26 @@ class UserRepositoryTest {
             // Complete
             awaitComplete()
         }
+    }
+
+    @Test
+    fun `network errors are propagated to calling code`() = runTest {
+        // Arrange
+        coEvery {
+            gitHubUserApi.getUsers(
+                any<Int>(),
+                any<Int>()
+            )
+        } throws NetworkError.HttpError(404, "Not Found")
+
+        // Act
+        val result = userRepository.getUserList()
+
+        // Assert
+        assertTrue(result.isFailure)
+        assertEquals(404, (result.exceptionOrNull() as NetworkError.HttpError).code)
+        assertEquals("Not Found", result.exceptionOrNull()?.message)
+        coVerify { gitHubUserApi.getUsers(null) }
     }
 
     companion object {
