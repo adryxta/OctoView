@@ -39,12 +39,12 @@ fun ListScreen(
         },
         content = {
             UserList(
-                uiState = uiState,
                 modifier = Modifier.padding(it),
                 users = uiState.users,
                 onClick = { user ->
                     onProfileClick(user.login)
-                }
+                },
+                isLoading = uiState.isLoading,
             )
         }
     )

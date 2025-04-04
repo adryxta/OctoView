@@ -7,15 +7,16 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import dev.adryxta.octoview.data.model.User
 import dev.adryxta.octoview.ui.common.LoadingItem
 
 @Composable
 fun UserList(
-    uiState: ListViewModel.UiState,
     modifier: Modifier,
     users: List<User>,
+    isLoading: Boolean,
     onClick: (user: User) -> Unit,
 ) {
     LazyVerticalGrid(
@@ -33,18 +34,17 @@ fun UserList(
             )
         }
         item {
-            if(uiState.isLoading) {
+            if(isLoading) {
                 LoadingItem()
             }
         }
     }
 }
 
-/*
 @Preview(showBackground = true)
 @Composable
 private fun UserListScreenPreview() {
-    UserListScreen (
+    UserList (
         users = listOf(
             User.Profile(
                 login = "octocat",
@@ -89,6 +89,8 @@ private fun UserListScreenPreview() {
                 email = "dfjngnf@gmail.com"
             )
         ),
-        onProfileClick = {}
+        onClick = {},
+        isLoading = true,
+        modifier = Modifier.padding(20.dp) // Add padding to the preview
     )
-}*/
+}
