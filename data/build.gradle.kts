@@ -43,23 +43,24 @@ android {
 
 dependencies {
 
-    api(libs.converter.kotlinx.serialization)
+    api(libs.okhttp.converter.kotlinx.serialization)
     api(libs.kotlinx.serialization.json)
     api(libs.kotlinx.coroutines.android)
 
     implementation(libs.retrofit)
-    implementation(libs.logging.interceptor)
+    implementation(libs.retrofit.logging.interceptor)
     implementation(libs.timber)
+
     implementation(libs.hilt.android)
     kapt(libs.hilt.android.compiler)
 
     testImplementation(libs.junit)
+    testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.mockk.android)
     testImplementation(libs.mockk.agent)
+    testImplementation(libs.retrofit.mockwebserver)
     testImplementation(libs.turbine)
     testImplementation(libs.truth)
-    testImplementation(libs.mockwebserver)
-    testImplementation(libs.kotlinx.coroutines.test)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 }
