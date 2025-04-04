@@ -10,19 +10,18 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -31,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import dev.adryxta.octoview.R
 import dev.adryxta.octoview.data.model.User
+import dev.adryxta.octoview.ui.theme.Avocado
 import java.time.LocalDateTime
 import java.util.Locale
 
@@ -44,9 +44,9 @@ fun UserDetail(
      * [details] is available after the user profile is fetched (network delay).
      */
     details: User.Details? = null,
-    onClickBlog: () -> Unit = {},
-    onClickMail: () -> Unit = {},
-    onClickX: () -> Unit = {},
+    onClickBlog: (blog: String) -> Unit,
+    onClickMail: (email: String) -> Unit,
+    onClickX: (username: String) -> Unit,
 ) {
     LazyVerticalGrid(
         columns = GridCells.Adaptive(minSize = 360.dp),
@@ -136,7 +136,7 @@ fun UserDetail(
                             modifier = Modifier
                                 .padding(horizontal = 16.dp, vertical = 5.dp)
                                 .clickable {
-                                    onClickBlog.invoke()
+                                    onClickBlog(it)
                                 }
                         ) {
                             Icon(
@@ -153,10 +153,13 @@ fun UserDetail(
                     }
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp, vertical = 5.dp)
                 ) {
                     details?.email?.let {
                         IconButton(
-                            onClick = onClickMail,
+                            colors = IconButtonDefaults.filledTonalIconButtonColors(),
+                            onClick = { onClickMail.invoke(it) },
                         ) {
                             Icon(
                                 painter = painterResource(R.drawable.ic_mail),
@@ -166,7 +169,8 @@ fun UserDetail(
                     }
                     details?.twitterUsername?.let {
                         IconButton(
-                            onClick = onClickX,
+                            colors = IconButtonDefaults.filledTonalIconButtonColors(),
+                            onClick = { onClickX.invoke(it) },
                         ) {
                             Icon(
                                 painter = painterResource(R.drawable.ic_twitter_x),
@@ -179,7 +183,7 @@ fun UserDetail(
                             painter = painterResource(R.drawable.online),
                             contentDescription = stringResource(R.string.cd_ic_hire),
                             modifier = Modifier.padding(start = 16.dp, end = 5.dp),
-                            tint = Color.Green
+                            tint = Avocado
                         )
                         Text(
                             text = stringResource(R.string.hireable_text),
@@ -281,6 +285,9 @@ private fun UserDetailPreview() {
             hireable = true,
             twitterUsername = "octocat",
         ),
+        onClickBlog = {},
+        onClickMail = {},
+        onClickX = {},
     )
 }
 

@@ -27,7 +27,11 @@ import dev.adryxta.octoview.ui.common.ErrorItem
 @Composable
 fun DetailsScreen(
     viewModel: DetailsViewModel = hiltViewModel(),
-    onBackClick: () -> Boolean
+    onBackClick: () -> Boolean,
+    onClickBlog: (blog: String) -> Unit,
+    onClickMail: (mail: String) -> Unit,
+    onClickX: (username: String) -> Unit,
+    onClickProfile: (login: String) -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsState()
     Scaffold(
@@ -53,7 +57,7 @@ fun DetailsScreen(
         },
         bottomBar = {
             Button(
-                onClick = { /*TODO*/ },
+                onClick = { onClickProfile.invoke(viewModel.profile.login) },
                 modifier = Modifier
                     .padding(10.dp)
                     .fillMaxWidth(),
@@ -79,9 +83,15 @@ fun DetailsScreen(
                         UserDetail(
                             profile = (uiState as DetailUiState.Success).profile,
                             details = (uiState as DetailUiState.Success).details,
-                            onClickBlog = {},
-                            onClickMail = {},
-                            onClickX = {},
+                            onClickBlog = { blog ->
+                                onClickBlog(blog)
+                            },
+                            onClickMail = { email ->
+                                onClickMail(email)
+                            },
+                            onClickX = { username ->
+                                onClickX(username)
+                            },
                         )
                     }
                 }
