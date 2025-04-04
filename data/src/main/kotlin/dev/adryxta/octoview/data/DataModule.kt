@@ -16,7 +16,7 @@ class SingletonModule {
     @Provides
     internal fun provideApiService(
         @Named(DataModule.API_BASE_URL) baseUrl: String,
-        @Named(DataModule.AUTH_TOKEN) authToken: String
+        @Named(DataModule.API_AUTH_TOKEN) authToken: String
     ): GitHubUserApi {
         return GitHubUserApi.create(baseUrl, authToken)
     }
@@ -33,6 +33,6 @@ abstract class DataModule {
 
     companion object {
         const val API_BASE_URL = "api-base-url"
-        const val AUTH_TOKEN = "auth-token"
+        const val API_AUTH_TOKEN = "api-auth-token"
     }
 }

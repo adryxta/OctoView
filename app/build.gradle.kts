@@ -1,3 +1,8 @@
+import org.jetbrains.kotlin.konan.properties.hasProperty
+import java.io.FileInputStream
+import java.io.InputStreamReader
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -17,6 +22,9 @@ android {
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
+
+        buildConfigField("String", "API_BASE_URL", "\"${(getLocalProperty("api.baseUrl") as String)}\"")
+        buildConfigField("String", "API_AUTH_TOKEN", "\"${(getLocalProperty("api.authToken") as String)}\"")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -71,4 +79,19 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+}
+
+fun Project.getLocalProperty(key: String, file: String = "local.properties"): Any {
+    val properties = Properties()
+    val localProperties = File(file)
+    if (localProperties.isFile) {
+        InputStreamReader(FileInputStream(localProperties), Charsets.UTF_8).use { reader ->
+            properties.load(reader)
+        }
+    } else error("!! File $file not found in the project.")
+
+    if (!(properties.hasProperty(key))) {
+        error("!! Property $key not found in $file. Please add it.")
+    }
+    return properties.getProperty(key)
 }

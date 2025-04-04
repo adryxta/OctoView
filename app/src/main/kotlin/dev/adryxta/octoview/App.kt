@@ -31,13 +31,13 @@ class App : Application() {
         @Provides
         @Named(DataModule.API_BASE_URL)
         internal fun provideApiBaseUrl(): String {
-            return "https://api.github.com/"
+            return BuildConfig.API_BASE_URL
         }
 
         @Provides
-        @Named(DataModule.AUTH_TOKEN)
+        @Named(DataModule.API_AUTH_TOKEN)
         internal fun provideAuthToken(): String {
-            return "auth-token"
+            return BuildConfig.API_AUTH_TOKEN
         }
     }
 }
