@@ -1,14 +1,20 @@
 package dev.adryxta.octoview.data
 
 import dev.adryxta.octoview.data.model.User
-import java.util.concurrent.Flow
+import kotlinx.coroutines.flow.Flow
 
-class UserRepository {
-    fun getUserList(previousUserId: Int? = null): List<User.Profile> {
+interface UserRepository {
+    fun getUserList(previousUserId: Int? = null): List<User.Profile>
+
+    fun getUserDetails(): Flow<User>
+}
+
+internal class DefaultUserRepository : UserRepository {
+    override fun getUserList(previousUserId: Int?): List<User.Profile> {
         TODO("Not yet implemented")
     }
 
-    fun getUserDetails(): Flow {
+    override fun getUserDetails(): Flow<User> {
         TODO("Not yet implemented")
     }
 }

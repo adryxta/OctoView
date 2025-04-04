@@ -4,6 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType
+import okhttp3.OkHttpClient
 import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
@@ -108,14 +109,39 @@ internal interface GitHubUserApi {
     )
 
     companion object {
-        fun create(baseUrl: String): GitHubUserApi {
+
+        private val gitHubConvertorFactories = arrayOf(
+            MediaType.get("application/json; charset=UTF8"),
+            MediaType.get("application/vnd.github+json"),
+        ).map { Json.asConverterFactory(it) }
+
+        fun create(
+            baseUrl: String,
+            authToken: String
+        ): GitHubUserApi {
+            // https://docs.github.com/en/rest/using-the-rest-api
+            val okHttpClient = OkHttpClient.Builder()
+                //.cache(Cache())
+                .followRedirects(true)
+                .addInterceptor { chain ->
+                    val request = chain.request()
+                    val newRequest = request.newBuilder()
+                        .header("Accept", "application/vnd.github+json")
+                        .header("User-Agent", "OctoView")
+                        .header("Authorization", "Bearer $authToken")
+                        .build()
+                    chain.proceed(newRequest)
+                }.build()
+
             val retrofit = Retrofit.Builder()
                 .baseUrl(baseUrl)
-                .addConverterFactory(
-                    Json.asConverterFactory(
-                        MediaType.get("application/json; charset=UTF8")
-                    )
-                ).build()
+                .client(okHttpClient)
+                .apply {
+                    gitHubConvertorFactories.forEach {
+                        addConverterFactory(it)
+                    }
+                }.build()
+
             return retrofit.create(GitHubUserApi::class.java)
         }
     }
