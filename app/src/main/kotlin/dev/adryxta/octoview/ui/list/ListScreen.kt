@@ -12,13 +12,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import dev.adryxta.octoview.R
-import dev.adryxta.octoview.data.UserLogin
+import dev.adryxta.octoview.data.model.User
 import dev.adryxta.octoview.ui.common.TopBar
 
 @Composable
 fun ListScreen(
     viewModel: ListViewModel = hiltViewModel(),
-    onProfileClick: (login: UserLogin) -> Unit
+    onProfileClick: (login: User.Profile) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -42,7 +42,7 @@ fun ListScreen(
                 modifier = Modifier.padding(it),
                 users = uiState.users,
                 onClick = { user ->
-                    onProfileClick(user.login)
+                    onProfileClick(user)
                 },
                 isLoading = uiState.isLoading,
             )

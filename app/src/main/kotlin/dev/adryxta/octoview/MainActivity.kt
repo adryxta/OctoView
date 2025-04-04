@@ -24,8 +24,14 @@ class MainActivity : ComponentActivity() {
             OctoViewTheme {
                 NavHost(navController = navController, startDestination = Routes.List) {
                     composable<Routes.List> {
-                        ListScreen(onProfileClick = { login ->
-                            navController.navigate(Routes.Details(login))
+                        ListScreen(onProfileClick = { profile ->
+                            navController.navigate(
+                                Routes.Details(
+                                    id = profile.id,
+                                    login = profile.login,
+                                    avatarUrl = profile.avatarUrl
+                                )
+                            )
                         })
                     }
                     composable<Routes.Details> { backStackEntry ->
@@ -46,6 +52,10 @@ class MainActivity : ComponentActivity() {
         data object List : Routes()
 
         @Serializable
-        data class Details(val login: String) : Routes()
+        data class Details(
+            val id: Int,
+            val login: String,
+            val avatarUrl: String? = null,
+        ) : Routes()
     }
 }

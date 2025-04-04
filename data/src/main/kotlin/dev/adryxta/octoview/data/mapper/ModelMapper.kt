@@ -10,8 +10,6 @@ private val GITHUB_DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm
 internal fun GitHubUserApi.User.toModel() = User.Profile(
     id = id,
     login = login,
-    name = name,
-    email = email,
     avatarUrl = avatarUrl,
 )
 

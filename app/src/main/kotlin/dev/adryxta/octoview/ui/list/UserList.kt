@@ -15,9 +15,9 @@ import dev.adryxta.octoview.ui.common.LoadingItem
 @Composable
 fun UserList(
     modifier: Modifier,
-    users: List<User>,
+    users: List<User.Profile>,
     isLoading: Boolean,
-    onClick: (user: User) -> Unit,
+    onClick: (user: User.Profile) -> Unit,
 ) {
     LazyVerticalGrid(
         modifier = modifier
@@ -30,11 +30,11 @@ fun UserList(
             UserCard(
                 userAvatarUrl = user.avatarUrl,
                 username = user.login,
-                onClick = { onClick(user)}
+                onClick = { onClick(user) }
             )
         }
         item {
-            if(isLoading) {
+            if (isLoading) {
                 LoadingItem()
             }
         }
@@ -44,49 +44,37 @@ fun UserList(
 @Preview(showBackground = true)
 @Composable
 private fun UserListScreenPreview() {
-    UserList (
+    UserList(
         users = listOf(
             User.Profile(
                 login = "octocat",
                 avatarUrl = "https://avatars.githubusercontent.com/u/1?v=4",
                 id = 100,
-                name = "The Octocat",
-                email = "dfjngnf@gmail.com"
             ),
             User.Profile(
                 login = "octocat",
                 avatarUrl = "https://avatars.githubusercontent.com/u/1?v=4",
                 id = 100,
-                name = "The Octocat",
-                email = "dfjngnf@gmail.com"
             ),
             User.Profile(
                 login = "octocat",
                 avatarUrl = "https://avatars.githubusercontent.com/u/1?v=4",
                 id = 100,
-                name = "The Octocat",
-                email = "dfjngnf@gmail.com"
             ),
             User.Profile(
                 login = "octocat",
                 avatarUrl = "https://avatars.githubusercontent.com/u/1?v=4",
                 id = 100,
-                name = "The Octocat",
-                email = "dfjngnf@gmail.com"
             ),
             User.Profile(
                 login = "octocat",
                 avatarUrl = "https://avatars.githubusercontent.com/u/1?v=4",
                 id = 100,
-                name = "The Octocat",
-                email = "dfjngnf@gmail.com"
             ),
             User.Profile(
                 login = "octocat",
                 avatarUrl = "https://avatars.githubusercontent.com/u/1?v=4",
                 id = 100,
-                name = "The Octocat",
-                email = "dfjngnf@gmail.com"
             )
         ),
         onClick = {},

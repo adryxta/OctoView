@@ -21,42 +21,36 @@ class DetailsViewModel @Inject constructor(
     private val userRepository: UserRepository
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(UiState())
+    val profile = with(savedStateHandle) {
+        User.Profile(
+            id = savedStateHandle.require<Int>("id"),
+            login = savedStateHandle.require<String>("login"),
+            avatarUrl = savedStateHandle.require<String>("avatarUrl")
+        )
+    }
+
+    private val _uiState = MutableStateFlow(UiState(profile = profile))
     val uiState: StateFlow<UiState>
         get() = _uiState.asStateFlow()
 
     init {
-        val login = savedStateHandle.get<String>("login")
-        if (login == null) {
-            Timber.e("Login is null")
-            // TODO Show error
-        } else {
-            userRepository.getUserDetails(login).onEach { user ->
-                Timber.d("User $login: $user")
-                _uiState.update { it.copy(user = user) }
-            }.launchIn(viewModelScope)
-//            _uiState.combine(userRepository.getUserDetails(login)) { uiState, user ->
-//                uiState.copy(user = user)
-//            }
-//            viewModelScope.launch {
-//                try {
-//                    userRepository.getUserDetails(login).collect {
-//                        _uiState.update {
-//                            it.copy(user = it.user)
-//                        }
-//                    }
-//                } catch (throwable: Throwable) {
-//                    _uiState.update {
-//                        it.copy(error = throwable.message)
-//                    }
-//                }
-//            }
-        }
+        userRepository.getUserDetails(profile.login).onEach { user ->
+            Timber.d("User ${profile.login}: $user")
+            when (user) {
+                is User.Profile -> _uiState.update { it.copy(profile = user) }
+                is User.Details -> _uiState.update { it.copy(details = user) }
+            }
+        }.launchIn(viewModelScope)
     }
 
     data class UiState(
         val isLoading: Boolean = false,
-        val user: User? = null,
+        val profile: User.Profile,
+        val details: User.Details? = null,
         val error: String? = null
     )
+
+    private fun <T> SavedStateHandle.require(key: String): T {
+        return get<T>(key) ?: throw IllegalStateException("No value found for key: $key")
+    }
 }

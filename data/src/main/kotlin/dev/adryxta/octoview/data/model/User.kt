@@ -8,16 +8,12 @@ import java.time.LocalDateTime
 sealed class User {
     abstract val id: Int
     abstract val login: String
-    abstract val name: String?
-    abstract val email: String?
     abstract val avatarUrl: String
 
     @Serializable
     data class Profile(
         override val id: Int,
         override val login: String,
-        override val name: String?,
-        override val email: String?,
         override val avatarUrl: String
     ) : User()
 
@@ -25,9 +21,9 @@ sealed class User {
     data class Details(
         override val id: Int,
         override val login: String,
-        override val name: String?,
-        override val email: String?,
         override val avatarUrl: String,
+        val name: String?,
+        val email: String?,
         val company: String?,
         val blog: String?,
         val location: String?,
