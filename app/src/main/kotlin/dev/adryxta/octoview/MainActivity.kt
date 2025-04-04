@@ -44,7 +44,8 @@ class MainActivity : ComponentActivity() {
                                     avatarUrl = profile.avatarUrl
                                 )
                             ) },
-                            fetchMore = {listViewModel.loadUsers()}
+                            fetchMore = {listViewModel.loadUsers()},
+                            onRefresh = { listViewModel.reload() },
                         )
                     }
                     composable<Routes.Details> { backStackEntry ->

@@ -19,6 +19,7 @@ fun ListScreen(
     uiState: ListUiState,
     onProfileClick: (login: User.Profile) -> Unit,
     fetchMore: () -> Unit,
+    onRefresh: () -> Unit,
 ) {
 
     Scaffold(
@@ -39,7 +40,7 @@ fun ListScreen(
         content = {
             when (uiState) {
                 is ListUiState.Error -> ErrorItem(
-                    message = uiState.message,
+                    message = uiState.error?.message?: "Unknown error",
                 )
                 is ListUiState.Success -> {
                     UserList(
@@ -48,6 +49,8 @@ fun ListScreen(
                         onClick = { user ->
                             onProfileClick(user)
                         },
+                        isRefreshing = uiState.isLoading,
+                        onRefresh = onRefresh,
                         fetchMore = fetchMore,
                     )
                 }

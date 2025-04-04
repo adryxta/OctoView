@@ -17,13 +17,15 @@ sealed interface ListUiState {
         val isLoading: Boolean,
         val users: List<User.Profile>,
     ) : ListUiState
-    data class Error(val message: String) : ListUiState
+    data class Error(
+        val error: Throwable?
+    ) : ListUiState
 }
 
 internal data class ListViewModelState(
     val isLoading: Boolean = false,
     val users: List<User.Profile> = emptyList(),
-    val error: String? = null,
+    val error: Throwable? = null,
     val lastId: Int? = null,
 ) {
     fun toUiState(): ListUiState = when {
@@ -47,6 +49,17 @@ class ListViewModel @Inject internal constructor(
         )
 
     init {
+        loadUsers()
+    }
+
+    fun reload() {
+        viewModelState.update {
+            it.copy(
+                lastId = null,
+                error = null,
+                users = emptyList()
+            )
+        }
         loadUsers()
     }
 
