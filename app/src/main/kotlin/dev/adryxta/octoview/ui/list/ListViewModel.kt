@@ -3,6 +3,7 @@ package dev.adryxta.octoview.ui.list
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.adryxta.octoview.data.UserRepository
 import dev.adryxta.octoview.data.model.User
 import dev.adryxta.octoview.utils.ErrorCode
@@ -38,6 +39,7 @@ internal data class ListViewModelState(
     }
 }
 
+@HiltViewModel
 class ListViewModel @Inject internal constructor(
     private val userRepository: UserRepository
 ) : ViewModel() {

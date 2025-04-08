@@ -8,12 +8,14 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import dev.adryxta.octoview.R
 import dev.adryxta.octoview.data.model.User
 import dev.adryxta.octoview.ui.common.ErrorItem
@@ -21,11 +23,14 @@ import dev.adryxta.octoview.ui.common.ErrorItem
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ListScreen(
-    uiState: ListUiState,
+    viewModel: ListViewModel = hiltViewModel(),
     onProfileClick: (login: User.Profile) -> Unit,
-    fetchMore: () -> Unit,
-    onRefresh: () -> Unit,
 ) {
+    val uiState by viewModel.uiState.collectAsState()
+
+    val onRefresh = { viewModel.reload() }
+    val fetchMore = { viewModel.loadUsers() }
+
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -47,9 +52,9 @@ fun ListScreen(
             )
         },
         content = {
-            when (uiState) {
+            when (val state = uiState) {
                 is ListUiState.Error -> ErrorItem(
-                    errorCode = uiState.error,
+                    errorCode = state.error,
                     canRetry = true,
                     onRetry = onRefresh,
                 )
@@ -57,41 +62,16 @@ fun ListScreen(
                 is ListUiState.Success -> {
                     UserList(
                         modifier = Modifier.padding(it),
-                        users = uiState.users,
+                        users = state.users,
                         onClick = { user ->
                             onProfileClick(user)
                         },
-                        isRefreshing = uiState.isLoading,
+                        isRefreshing = state.isLoading,
                         onRefresh = onRefresh,
                         fetchMore = fetchMore,
                     )
                 }
             }
         }
-    )
-}
-
-@Preview
-@Composable
-private fun ListScreenPreview() {
-    ListScreen(
-        uiState = ListUiState.Success(
-            users = listOf(
-                User.Profile(
-                    id = 1,
-                    login = "adryxta",
-                    avatarUrl = "https://avatars.githubusercontent.com/u/1234567?v=4",
-                ),
-                User.Profile(
-                    id = 2,
-                    login = "octocat",
-                    avatarUrl = "https://avatars.githubusercontent.com/u/1234567?v=4",
-                ),
-            ),
-            isLoading = false,
-        ),
-        onProfileClick = { },
-        fetchMore = { },
-        onRefresh = { },
     )
 }
